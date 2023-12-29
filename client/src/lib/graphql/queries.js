@@ -4,7 +4,6 @@ import {ApolloClient, InMemoryCache, gql, createHttpLink, ApolloLink, concat} fr
 const httpLink = createHttpLink({uri: 'http://localhost:9000/graphql'});
 
 const authLink = new ApolloLink((operation, forward) => {
-    console.log('[customLink] operation: ', operation);
     const accessToken = getAccessToken();
     if (accessToken) {
         operation.setContext({
@@ -16,7 +15,7 @@ const authLink = new ApolloLink((operation, forward) => {
     return forward(operation);
 })
 
-const apolloClient = new ApolloClient({
+export const apolloClient = new ApolloClient({
     link: concat(authLink, httpLink),
     cache: new InMemoryCache(),
 });
@@ -35,6 +34,21 @@ const jobDetailFragment = gql`
     }
 `;
 
+export const companyByIdQuery = gql`
+    query CompanyById ($id : ID!) {
+        company(id: $id) {
+            id
+            name
+            description
+            jobs {
+                id
+                date
+                title
+            }
+        }
+    }
+`;
+
 const jobByIdQuery = gql`
     query JobById ($id : ID!) {
         job(id: $id) {
@@ -43,6 +57,7 @@ const jobByIdQuery = gql`
     }
     ${jobDetailFragment}
 `;
+
 export async function getJobs() {
     const query = gql`
         query Jobs {
@@ -96,24 +111,4 @@ export async function createJob({title, description}) {
         },
     });
     return data.job;
-}
-
-export async function getCompany(id) {
-    const query = gql`
-        query CompanyById ($id : ID!) {
-            company(id: $id) {
-                id
-                name
-                description
-                jobs {
-                    id
-                    date
-                    title
-                }
-            }
-        }
-    `;
-
-    const {data} = await apolloClient.query({query, variables: {id}});
-    return data.company;
 }
