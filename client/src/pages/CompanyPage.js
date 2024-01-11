@@ -2,7 +2,6 @@ import {useParams} from 'react-router';
 import JobList from "../components/JobList";
 import {useCompany} from "../lib/graphql/hooks";
 
-
 function CompanyPage() {
     const {companyId} = useParams();
     const {company, error, loading} = useCompany(companyId);
