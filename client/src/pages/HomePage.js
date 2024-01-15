@@ -1,6 +1,7 @@
 import JobList from '../components/JobList';
 import {useJobs} from "../lib/graphql/hooks";
 import {useState} from "react";
+import PaginationBar from "../components/PaginationBar";
 
 const JOBS_PER_PAGE = 5;
 
@@ -16,17 +17,14 @@ function HomePage() {
         return <div className='has-text-danger'>Error loading jobs</div>;
     }
 
+    const totalPages = Math.ceil(jobs.totalCount / JOBS_PER_PAGE);
     return (
         <div>
             <h1 className="title">
                 Job Board
             </h1>
-            <div>
-                <button onClick={() => setCurrentPage(currentPage - 1)}>Previous</button>
-                <span> {currentPage} </span>
-                <button onClick={() => setCurrentPage(currentPage + 1)}>Next</button>
-            </div>
-            <JobList jobs={jobs}/>
+            <PaginationBar currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage}/>
+            <JobList jobs={jobs.items}/>
         </div>
     );
 }
