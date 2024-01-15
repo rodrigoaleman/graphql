@@ -1,5 +1,3 @@
-// noinspection JSPotentiallyInvalidConstructorUsage
-
 import {createJob, deleteJob, getJob, getJobs, getJobsByCompany, updateJob} from "./db/jobs.js";
 import {getCompany} from "./db/companies.js";
 import {GraphQLError} from "graphql";
@@ -47,18 +45,19 @@ export const resolvers = {
 
     Job: {
         date: (job) => toIsoDate(job.createdAt),
-        company: (job) => getCompany(job.companyId)
+        company: (job, _args, {companyLoader}) => companyLoader.load(job.companyId)
     }
 };
 
 function notFoundError(message) {
     throw new GraphQLError(message, {
-        extensions: { code: 'NOT_FOUND'}
+        extensions: {code: 'NOT_FOUND'}
     })
 }
+
 function unauthorizedError(message) {
     throw new GraphQLError(message, {
-        extensions: { code: 'UNAUTHORIZED'}
+        extensions: {code: 'UNAUTHORIZED'}
     })
 }
 
